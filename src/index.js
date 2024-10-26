@@ -1,4 +1,5 @@
-import { initialCards, createCard, deleteCard, likeCard } from "../src/scripts/cards.js";
+import { initialCards } from "../src/scripts/cards.js";
+import { createCard, deleteCard, likeCard } from "../src/scripts/card.js";
 import { closeModal, openModal, closeModalEsc, closeModalOverlay } from "../src/scripts/modal.js";
 import '../src/pages/index.css';
 
@@ -19,7 +20,7 @@ const popupImage = document.querySelector('.popup_type_image');
 const popupImageLink = document.querySelector('.popup__image');
 const popupImageCaption = document.querySelector('.popup__caption');
 
-const editProfileForm = document.querySelector('.popup__form');
+const editProfileForm = document.forms['edit-profile'];
 const nameInput = editProfileForm.querySelector('.popup__input_type_name');
 const jobInput = editProfileForm.querySelector('.popup__input_type_description');
 const titleProfile = document.querySelector('.profile__title');
@@ -36,12 +37,13 @@ function zoomImage(card) {
   const cardTitle = card.querySelector('.card__title');
   popupImageLink.src = imageCard.src;
   popupImageCaption.textContent = cardTitle.textContent;
-  popupImage.classList.add('popup_is-opened');
+  popupImageLink.alt = imageCard.alt;
+  openModal(popupImage);
   document.addEventListener('keydown', closeModalEsc);
   document.addEventListener('click', closeModalOverlay);
 };
 
-function handleFormSubmit(evt) {
+function handleFormProfileSubmit(evt) {
   evt.preventDefault();
   titleProfile.textContent = nameInput.value;
   descriptionProfile.textContent = jobInput.value;
@@ -65,7 +67,7 @@ popupEditProfileButton.addEventListener('click', function() {
   jobInput.value = descriptionProfile.textContent; 
 });
 
-editProfileForm.addEventListener('submit', handleFormSubmit);
+editProfileForm.addEventListener('submit', handleFormProfileSubmit);
 
 popupButtonAddCard.addEventListener('click', function() {
   openModal(popupAddNewCard)

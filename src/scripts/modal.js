@@ -6,14 +6,15 @@ function openModal(popup) {
     document.addEventListener('click', closeModalOverlay);
   };
 
-  function closeModal() {
-    for (let i = 0; i < popups.length; i++) {
-    const popup = popups[i];
-    if (popup.classList.contains('popup_is-opened')) {
-    popup.classList.remove('popup_is-opened');
-    } 
+  function closeModal() { 
+    for (let i = 0; i < popups.length; i++) { 
+    const popup = popups[i]; 
+    if (popup.classList.contains('popup_is-opened')) { 
+    popup.classList.remove('popup_is-opened'); 
+    }  
   } document.removeEventListener('keydown', closeModalEsc);
-  };
+    document.removeEventListener('click', closeModalOverlay);
+  }; 
 
   function closeModalEsc(evt) {
     if (evt.key === 'Escape') {
