@@ -47,7 +47,8 @@ function handleFormProfileSubmit(evt) {
   evt.preventDefault();
   titleProfile.textContent = nameInput.value;
   descriptionProfile.textContent = jobInput.value;
-  closeModal();
+  const popup = document.querySelector('.popup_is-opened');
+  closeModal(popup);
 };
 
 function handleFormSubmitNewCard(evt) {
@@ -58,7 +59,8 @@ function handleFormSubmitNewCard(evt) {
   }, likeCard, zoomImage);
   cardsContainer.prepend(newCard);
   addNewCardForm.reset();
-  closeModal();
+  const popup = document.querySelector('.popup_is-opened');
+  closeModal(popup);
 };
 
 popupEditProfileButton.addEventListener('click', function() {
@@ -76,5 +78,8 @@ popupButtonAddCard.addEventListener('click', function() {
 addNewCardForm.addEventListener('submit', handleFormSubmitNewCard);
 
 popupButtonClose.forEach(button => {
-  button.addEventListener('click', closeModal);
+  button.addEventListener('click', () => {
+    const popup = button.closest('.popup');
+    closeModal(popup);
+  });
 });
