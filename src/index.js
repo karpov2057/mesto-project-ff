@@ -39,8 +39,6 @@ function zoomImage(card) {
   popupImageCaption.textContent = cardTitle.textContent;
   popupImageLink.alt = imageCard.alt;
   openModal(popupImage);
-  document.addEventListener('keydown', closeModalEsc);
-  document.addEventListener('click', closeModalOverlay);
 };
 
 function handleFormProfileSubmit(evt) {
