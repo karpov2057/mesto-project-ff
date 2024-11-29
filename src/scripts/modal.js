@@ -1,3 +1,5 @@
+//import { clearValidation, validationSettings } from "./validation.js";
+
 function openModal(popup) {
     popup.classList.add('popup_is-opened');
     document.addEventListener('keydown', closeModalEsc);
@@ -8,6 +10,7 @@ function openModal(popup) {
     popup.classList.remove('popup_is-opened');
     document.removeEventListener('keydown', closeModalEsc);
     document.removeEventListener('click', closeModalOverlay);
+    //clearValidation(popup, validationSettings);
   };
 
   function closeModalEsc(evt) {
