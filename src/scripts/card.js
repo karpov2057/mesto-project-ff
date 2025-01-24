@@ -1,31 +1,30 @@
-function createCard(cardData, toggleLikeCard, zoomImageAction) {
+import { onHandleDeleteCard } from '../index.js';
+
+function createCard(cardData, toggleLikeCard, zoomImageAction, currentUserId) {
   const cardTemplate = document.querySelector('#card-template').content;
   const card = cardTemplate.querySelector('.card').cloneNode(true);
   const imageCard = card.querySelector('.card__image');
-  const buttonDelete = card.querySelector('.card__delete-button');
-  const likeCards = card.querySelector('.card__like-button');
+  const deleteButton = card.querySelector('.card__delete-button');
+  const likeButton = card.querySelector('.card__like-button');
   const likeCounter = card.querySelector('.card__like-counter');
-  const userid = '425d2e6950bbebfd9aae3ff3';
   card.querySelector('.card__title').textContent = cardData.name;
   imageCard.src = cardData.link;
   imageCard.alt = cardData.name;
   likeCounter.textContent = cardData.likes.length;
-  if (cardData.owner._id !== userid) {
-    buttonDelete.style.display = 'none';
-  } else {
-    //buttonDelete.addEventListener('click', () => handleDeleteCard(card));
+  
+  if (cardData.likes.some((like) => like._id === currentUserId)) {
+    likeButton.classList.add('card__like-button_is-active');
   }
-  likeCards.addEventListener('click', () => toggleLikeCard(likeCards));
+
+  if (cardData.owner._id !== currentUserId) {
+    deleteButton.style.display = 'none';
+  } else {
+    deleteButton.addEventListener('click', () => onHandleDeleteCard(cardData._id, card));
+  }
+  
+  likeButton.addEventListener('click', () => toggleLikeCard(cardData, likeButton, likeCounter));
   imageCard.addEventListener('click', () => zoomImageAction(card));
   return card;
 };
 
-function handleDeleteCard(сard) {
-  сard.remove();
-};
-
-function likeCard(likeButton) {
-  likeButton.classList.toggle('card__like-button_is-active');
-};
-
-export { createCard, handleDeleteCard, likeCard };
+export { createCard };

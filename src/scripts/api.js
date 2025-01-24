@@ -1,7 +1,7 @@
 const config = {
-    baseUrl: 'https://mesto.nomoreparties.co/v1/wff-cohort-26',
+    baseUrl: 'https://mesto.nomoreparties.co/v1/wff-cohort-30',
     headers: {
-      authorization: '299e752b-1c37-440e-aa7a-4185748db539',
+      authorization: '141478d8-1ab9-4959-9724-8d05972b2cc4',
       'Content-Type': 'application/json',
     }
 };
@@ -24,6 +24,17 @@ function userInfo() {
   return fetch (`${config.baseUrl}/users/me`, {
     method: 'GET',
     headers: config.headers,
+  })
+    .then(res => checkResponse(res)); 
+};
+
+function updateUserAvatar(data) {
+  return fetch(`${config.baseUrl}/users/me/avatar`, {
+    method: 'PATCH',
+    headers: config.headers,
+    body: JSON.stringify({
+      avatar: data.avatar
+    })
   })
     .then(res => checkResponse(res)); 
 };
@@ -75,4 +86,4 @@ function deleteLikeCard(cardId) {
   })
     .then(res => checkResponse(res)); 
 };
-export { getCards, userInfo, updateUserInfo, addCard, deleteCard, putLikeCard, deleteLikeCard };
+export { getCards, userInfo, updateUserInfo, updateUserAvatar, addCard, deleteCard, putLikeCard, deleteLikeCard };
