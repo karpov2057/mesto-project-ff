@@ -1,7 +1,7 @@
-import { createCard } from "../src/scripts/card.js";
+import { createCard, toggleLikeCard, onHandleDeleteCard } from "../src/scripts/card.js";
 import { closeModal, openModal, closeModalEsc, closeModalOverlay } from "../src/scripts/modal.js";
 import { enableValidation, clearValidation } from "../src/scripts/validation.js";
-import { getCards, userInfo, updateUserInfo, updateUserAvatar, addCard, deleteCard, putLikeCard, deleteLikeCard } from "../src/scripts/api.js";
+import { getCards, userInfo, updateUserInfo, updateUserAvatar, addCard } from "../src/scripts/api.js";
 import '../src/pages/index.css';
 
 // @todo: DOM узлы
@@ -18,7 +18,7 @@ Promise.all([
   linkAvatar.src = userData.avatar;
   
   cards.forEach((card) => {
-    const newCard = createCard(card, toggleLikeCard, zoomImage, userData._id);
+    const newCard = createCard(card, zoomImage, userData._id, onHandleDeleteCard, toggleLikeCard); 
     cardsContainer.append(newCard);
   });
 })
@@ -55,9 +55,6 @@ const inputLinkCard = popupAddNewCard.querySelector('.popup__input_type_url');
 const addNewCardButton = document.querySelector('.profile__add-button');
 const saveNewCardButton = addNewCardForm.querySelector('.popup__button');
 
-const cardDeleteModalWindow = document.querySelector('.popup_type_delete-card');
-const deleteCardPopupButton = cardDeleteModalWindow.querySelector('.popup__button');
-
 const settings = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -89,9 +86,7 @@ function addNewCard(evt) {
     .then(() => {
       inputNameCard.value = '';
       inputLinkCard.value = '';
-      location.reload();
-      const popup = document.querySelector('.popup_is-opened');
-      closeModal(popup);
+      closeModal(popupAddNewCard);
     })
     .catch(error => {
       console.error('Ошибка при создании карточки:', error);
@@ -113,8 +108,7 @@ function saveUserProfile() {
     .then(updatedData => {
       titleProfile.textContent = updatedData.name; 
       descriptionProfile.textContent = updatedData.about;
-      const popup = document.querySelector('.popup_is-opened');
-      closeModal(popup);
+      closeModal(popupProfile);
     })
     .catch(error => {
       console.error('Ошибка при обновлении данных профиля:', error);
@@ -136,8 +130,7 @@ function saveUserAvatar(evt) {
   updateUserAvatar(userData)
     .then(updatedData => {
       linkAvatar.src = updatedData.avatar;
-      const popup = document.querySelector('.popup_is-opened');
-      closeModal(popup);
+      closeModal(editAvatarPopup);
     })
     .catch(error => {
       console.error('Ошибка при обновлении аватара:', error);
@@ -151,64 +144,6 @@ function saveUserAvatar(evt) {
 function handleFormProfileSubmit(evt) {
   evt.preventDefault();
   saveUserProfile();
-};
-
-let cardForDelete = {}
-const onHandleDeleteCard = (cardId, card) => {
-  cardForDelete = {
-    id: cardId,
-    card
-  }
-  openModal(cardDeleteModalWindow);
-};
-
-const handleDeleteCardSubmit = (evt) => {
-  evt.preventDefault();
-  if (!cardForDelete.card) return;
-
-  deleteCard(cardForDelete.id)
-    .then(() => {
-      cardForDelete.card.remove();
-      closeModal(cardDeleteModalWindow);
-      cardForDelete = {};
-    })
-    .catch((error) => {
-      console.error("Не удалось удалить карточку:", error);
-    })
-};
-
-function toggleLikeCard(cardData, likeButton, likeCounter) {
-  const cardId = cardData._id;
-
-  if (likeButton.classList.contains('card__like-button_is-active')) {
-    handleDeleteLikeCard(cardData, likeButton, likeCounter);
-  } else {
-    handlePutLikeCard(cardData, likeButton, likeCounter);
-  }
-};
-
-function handlePutLikeCard(cardData, likeButton, likeCounter) {
-  const cardId = cardData._id;
-  putLikeCard(cardId)
-    .then((updatedCardData) => {
-      likeButton.classList.add('card__like-button_is-active');
-      likeCounter.textContent = updatedCardData.likes.length;
-    })
-    .catch(error => {
-      console.error('Ошибка при лайке карточки:', error);
-    });
-};
-
-function handleDeleteLikeCard(cardData, likeButton, likeCounter) {
-  const cardId = cardData._id;
-  deleteLikeCard(cardId)
-    .then((updatedCardData) => {
-      likeButton.classList.remove('card__like-button_is-active');
-      likeCounter.textContent = updatedCardData.likes.length;
-    })
-    .catch(error => {
-      console.error('Ошибка при удалении лайка карточки:', error);
-    });
 };
 
 popupEditProfileButton.addEventListener('click', function() {
@@ -234,8 +169,6 @@ addNewCardButton.addEventListener('click', function() {
   openModal(popupAddNewCard)
 });
 
-deleteCardPopupButton.addEventListener('click', handleDeleteCardSubmit);
-
 addNewCardForm.addEventListener('submit', addNewCard);
 
 popupButtonClose.forEach(button => {
@@ -253,5 +186,3 @@ enableValidation({
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__error_visible'
 });
-
-export { onHandleDeleteCard };
