@@ -1,7 +1,7 @@
-import { createCard, toggleLikeCard, onHandleDeleteCard } from "../src/scripts/card.js";
+import { createCard, toggleLikeCard, deleteCardFromDOM } from "../src/scripts/card.js";
 import { closeModal, openModal, closeModalEsc, closeModalOverlay } from "../src/scripts/modal.js";
 import { enableValidation, clearValidation } from "../src/scripts/validation.js";
-import { getCards, userInfo, updateUserInfo, updateUserAvatar, addCard } from "../src/scripts/api.js";
+import { getCards, userInfo, updateUserInfo, updateUserAvatar, addCard, deleteCard } from "../src/scripts/api.js";
 import '../src/pages/index.css';
 
 // @todo: DOM узлы
@@ -18,7 +18,7 @@ Promise.all([
   linkAvatar.src = userData.avatar;
   
   cards.forEach((card) => {
-    const newCard = createCard(card, zoomImage, userData._id, onHandleDeleteCard, toggleLikeCard); 
+    const newCard = createCard(card, zoomImage, userData._id, toggleLikeCard, onHandleDeleteCard); 
     cardsContainer.append(newCard);
   });
 })
@@ -55,6 +55,9 @@ const inputLinkCard = popupAddNewCard.querySelector('.popup__input_type_url');
 const addNewCardButton = document.querySelector('.profile__add-button');
 const saveNewCardButton = addNewCardForm.querySelector('.popup__button');
 
+const cardDeleteModalWindow = document.querySelector('.popup_type_delete-card');
+const deleteCardPopupButton = cardDeleteModalWindow.querySelector('.popup__button');
+
 const settings = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -73,6 +76,11 @@ function zoomImage(card) {
   openModal(popupImage);
 };
 
+const addNewCardForDOM = (cardData, zoomImageAction, currentUserId, handleLikeCard, deleteCardHandler) => {
+  const newCard = createCard(cardData, zoomImageAction, currentUserId, handleLikeCard, deleteCardHandler);
+  cardsContainer.prepend(newCard);
+};
+
 function addNewCard(evt) {
   evt.preventDefault();
   const newCard = {
@@ -83,7 +91,8 @@ function addNewCard(evt) {
   saveNewCardButton.textContent = 'Сохранение...';
 
   addCard(newCard)
-    .then(() => {
+    .then((cardData) => {
+      addNewCardForDOM(cardData, zoomImage, card.owner._id, toggleLikeCard, deleteCard);
       inputNameCard.value = '';
       inputLinkCard.value = '';
       closeModal(popupAddNewCard);
@@ -146,6 +155,30 @@ function handleFormProfileSubmit(evt) {
   saveUserProfile();
 };
 
+let cardForDelete = {}
+const onHandleDeleteCard = (cardId, card) => {
+  cardForDelete = {
+    id: cardId,
+    card
+  }
+  openModal(cardDeleteModalWindow);  
+};
+
+const handleDeleteCardSubmit = (evt) => {
+  evt.preventDefault();
+  if (!cardForDelete.card) return;
+
+  deleteCard(cardForDelete.id)
+    .then(() => {
+      deleteCardFromDOM(cardForDelete.card);
+      closeModal(cardDeleteModalWindow);
+      cardForDelete = {};
+    })
+    .catch((error) => {
+      console.error("Не удалось удалить карточку:", error);
+    })
+};
+
 popupEditProfileButton.addEventListener('click', function() {
   clearValidation(popupProfile, settings);
   openModal(popupProfile);
@@ -169,6 +202,8 @@ addNewCardButton.addEventListener('click', function() {
   openModal(popupAddNewCard)
 });
 
+deleteCardPopupButton.addEventListener('click', handleDeleteCardSubmit);
+
 addNewCardForm.addEventListener('submit', addNewCard);
 
 popupButtonClose.forEach(button => {
@@ -178,11 +213,4 @@ popupButtonClose.forEach(button => {
   });
 });
 
-enableValidation({
-  formSelector: '.popup__form',
-  inputSelector: '.popup__input',
-  submitButtonSelector: '.popup__button',
-  inactiveButtonClass: 'popup__button_disabled',
-  inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
-});
+enableValidation(settings);

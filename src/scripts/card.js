@@ -1,10 +1,6 @@
-import { deleteCard, putLikeCard, deleteLikeCard } from "../../src/scripts/api.js";
-import { openModal, closeModal } from "../scripts/modal.js";
+import { putLikeCard, deleteLikeCard } from "../../src/scripts/api.js";
 
-const cardDeleteModalWindow = document.querySelector('.popup_type_delete-card');
-const deleteCardPopupButton = cardDeleteModalWindow.querySelector('.popup__button');
-
-function createCard(cardData,  zoomImageAction, currentUserId, deleteCardHandler, handleLikeCard) {
+function createCard(cardData,  zoomImageAction, currentUserId, handleLikeCard, deleteCardHandler ) {
   const cardTemplate = document.querySelector('#card-template').content;
   const card = cardTemplate.querySelector('.card').cloneNode(true);
   const imageCard = card.querySelector('.card__image');
@@ -26,34 +22,13 @@ function createCard(cardData,  zoomImageAction, currentUserId, deleteCardHandler
     deleteButton.addEventListener('click', () => deleteCardHandler(cardData._id, card));
   }
   
-  deleteCardPopupButton.addEventListener('click', handleDeleteCardSubmit);
   likeButton.addEventListener('click', () => handleLikeCard(cardData, likeButton, likeCounter));
   imageCard.addEventListener('click', () => zoomImageAction(card));
   return card;
 };
 
-let cardForDelete = {}
-const onHandleDeleteCard = (cardId, card) => {
-  cardForDelete = {
-    id: cardId,
-    card
-  }
-  openModal(cardDeleteModalWindow);  
-};
-
-const handleDeleteCardSubmit = (evt) => {
-  evt.preventDefault();
-  if (!cardForDelete.card) return;
-
-  deleteCard(cardForDelete.id)
-    .then(() => {
-      cardForDelete.card.remove();
-      closeModal(cardDeleteModalWindow);
-      cardForDelete = {};
-    })
-    .catch((error) => {
-      console.error("Не удалось удалить карточку:", error);
-    })
+const deleteCardFromDOM  = (card) => {
+  card.remove();
 };
 
 function toggleLikeCard(cardData, likeButton, likeCounter) {
@@ -90,4 +65,4 @@ function handleDeleteLikeCard(cardData, likeButton, likeCounter) {
     });
 };
 
-export { createCard, toggleLikeCard, onHandleDeleteCard, handleDeleteCardSubmit };
+export { createCard, toggleLikeCard, deleteCardFromDOM };
