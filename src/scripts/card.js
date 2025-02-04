@@ -1,4 +1,4 @@
-import { putLikeCard, deleteLikeCard } from "../../src/scripts/api.js";
+import { deleteCard, putLikeCard, deleteLikeCard } from "../../src/scripts/api.js";
 
 function createCard(cardData,  zoomImageAction, currentUserId, handleLikeCard, deleteCardHandler ) {
   const cardTemplate = document.querySelector('#card-template').content;

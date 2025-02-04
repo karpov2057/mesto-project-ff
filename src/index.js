@@ -4,6 +4,8 @@ import { enableValidation, clearValidation } from "../src/scripts/validation.js"
 import { getCards, userInfo, updateUserInfo, updateUserAvatar, addCard, deleteCard } from "../src/scripts/api.js";
 import '../src/pages/index.css';
 
+let userId = {};
+
 // @todo: DOM узлы
 const cardsContainer = document.querySelector('.places__list');
 
@@ -16,9 +18,10 @@ Promise.all([
   titleProfile.textContent = userData.name;
   descriptionProfile.textContent = userData.about;
   linkAvatar.src = userData.avatar;
+  userId = userData._id;
   
   cards.forEach((card) => {
-    const newCard = createCard(card, zoomImage, userData._id, toggleLikeCard, onHandleDeleteCard); 
+    const newCard = createCard(card, zoomImage, userId, toggleLikeCard, onHandleDeleteCard); 
     cardsContainer.append(newCard);
   });
 })
@@ -92,7 +95,7 @@ function addNewCard(evt) {
 
   addCard(newCard)
     .then((cardData) => {
-      addNewCardForDOM(cardData, zoomImage, card.owner._id, toggleLikeCard, deleteCard);
+      addNewCardForDOM(cardData, zoomImage, userId, toggleLikeCard, onHandleDeleteCard);
       inputNameCard.value = '';
       inputLinkCard.value = '';
       closeModal(popupAddNewCard);
@@ -160,7 +163,7 @@ const onHandleDeleteCard = (cardId, card) => {
   cardForDelete = {
     id: cardId,
     card
-  }
+  };
   openModal(cardDeleteModalWindow);  
 };
 
